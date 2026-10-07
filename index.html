@@ -79,6 +79,7 @@
 
     button:disabled {
       opacity: 0.5;
+      cursor: not-allowed;
     }
 
     #preview {
@@ -86,6 +87,17 @@
       border-radius: 14px;
       margin-top: 20px;
       display: none;
+    }
+
+    #download {
+      display: none;
+      background: #222;
+      color: #fff;
+      border: 1px solid #555;
+    }
+
+    #download:hover {
+      background: #333;
     }
 
     #status {
@@ -101,6 +113,7 @@
 <div class="container">
 
   <h1>RoomCraft AI</h1>
+
   <div class="subtitle">
     Trasforma una stanza reale mantenendo la sua architettura.
   </div>
@@ -133,11 +146,17 @@
     <label>Cosa vuoi modificare?</label>
     <textarea id="modify">Mobili, illuminazione, tende, tappeto e decorazioni.</textarea>
 
-    <button id="generate">Genera il progetto</button>
+    <button id="generate">
+      Genera il progetto
+    </button>
 
     <div id="status"></div>
 
-    <img id="preview">
+    <img id="preview" alt="Progetto RoomCraft">
+
+    <button id="download">
+      ⬇️ Scarica immagine
+    </button>
 
   </div>
 
@@ -147,6 +166,7 @@
 const button = document.getElementById("generate");
 const status = document.getElementById("status");
 const preview = document.getElementById("preview");
+const downloadButton = document.getElementById("download");
 
 button.addEventListener("click", async () => {
 
@@ -158,18 +178,40 @@ button.addEventListener("click", async () => {
   }
 
   button.disabled = true;
-  status.textContent = "⏳ Sto analizzando la stanza e generando il progetto...";
+  downloadButton.style.display = "none";
+
+  status.textContent =
+    "⏳ Sto analizzando la stanza e generando il progetto...";
 
   try {
 
     const formData = new FormData();
 
     formData.append("photo", photo);
-    formData.append("style", document.getElementById("style").value);
-    formData.append("budget", document.getElementById("budget").value);
-    formData.append("dimensions", document.getElementById("dimensions").value);
-    formData.append("preserve", document.getElementById("preserve").value);
-    formData.append("modify", document.getElementById("modify").value);
+    formData.append(
+      "style",
+      document.getElementById("style").value
+    );
+
+    formData.append(
+      "budget",
+      document.getElementById("budget").value
+    );
+
+    formData.append(
+      "dimensions",
+      document.getElementById("dimensions").value
+    );
+
+    formData.append(
+      "preserve",
+      document.getElementById("preserve").value
+    );
+
+    formData.append(
+      "modify",
+      document.getElementById("modify").value
+    );
 
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -179,19 +221,28 @@ button.addEventListener("click", async () => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Errore durante la generazione.");
+      throw new Error(
+        data.error || "Errore durante la generazione."
+      );
     }
 
     if (!data.image) {
-      throw new Error("L'API non ha restituito un'immagine.");
+      throw new Error(
+        "L'API non ha restituito un'immagine."
+      );
     }
 
     preview.src = data.image;
     preview.style.display = "block";
 
+    downloadButton.style.display = "block";
+
     status.textContent = "✅ Progetto generato.";
 
   } catch (error) {
+
+    preview.style.display = "none";
+    downloadButton.style.display = "none";
 
     status.textContent = "❌ " + error.message;
 
@@ -200,6 +251,24 @@ button.addEventListener("click", async () => {
     button.disabled = false;
 
   }
+
+});
+
+
+downloadButton.addEventListener("click", () => {
+
+  if (!preview.src) {
+    return;
+  }
+
+  const link = document.createElement("a");
+
+  link.href = preview.src;
+  link.download = "roomcraft-progetto.jpg";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
 });
 </script>
