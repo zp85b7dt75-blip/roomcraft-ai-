@@ -35,47 +35,175 @@ export default async function handler(req, res) {
     const modify = fields.modify || "";
 
     const prompt = `
-Transform the uploaded room photograph into a realistic high-end interior design visualization.
+Transform the uploaded room photograph into a photorealistic,
+high-end interior design visualization.
 
-ROOM:
-- Living room
+THIS IS A CONTROLLED ROOM TRANSFORMATION.
+
+The uploaded photograph is the PRIMARY SOURCE OF TRUTH.
+The final image must remain recognizably the SAME physical room,
+seen from the SAME camera position.
+
+==================================================
+ROOM INFORMATION
+==================================================
+
+- Room type: Living room
 - Dimensions: ${dimensions}
 - Design style: ${style}
 - Budget target: €${budget}
 
-ABSOLUTELY PRESERVE:
+==================================================
+HIGHEST PRIORITY: PRESERVE THE EXISTING ROOM
+==================================================
+
+Preserve the existing physical architecture exactly.
+
+DO NOT:
+- change the room layout
+- change wall positions
+- change ceiling height
+- change the floor plan
+- move doors
+- move windows
+- add windows
+- remove windows
+- add doors
+- remove doors
+- change the staircase
+- change the staircase position
+- change structural beams
+- change architectural openings
+- change the perspective
+- change the camera viewpoint
+- change the camera height
+- change the focal composition
+- change the proportions of the room
+
+The final image must look as if the SAME room was professionally
+renovated and photographed from the SAME position.
+
+Do not create a different room inspired by the photograph.
+
+==================================================
+ELEMENTS TO PRESERVE
+==================================================
+
+The user explicitly requires these elements to remain unchanged:
+
 ${preserve}
 
-DO NOT change, remove, move or redesign the architecture or structural elements.
-Preserve the exact room geometry, perspective, walls, ceiling, floor, windows, doors and staircase.
-Preserve the existing television and its position.
+Treat these elements as FIXED CONSTRAINTS.
 
-CHANGE ONLY:
+Do not move, replace, resize, redesign or reinterpret them.
+
+==================================================
+ELEMENTS THAT MAY BE CHANGED
+==================================================
+
+Only modify the elements explicitly requested by the user:
+
 ${modify}
 
-DESIGN DIRECTION:
-Create a sophisticated, realistic and coherent interior.
-Use high-quality furniture, lighting, textiles, artwork and decorative objects appropriate to the selected style.
-The result must look like a professionally photographed real interior, not a 3D cartoon.
+Everything not listed as changeable should remain as close as
+possible to the original photograph.
 
-For Dark European Estate specifically, favor:
-- rich burgundy
+==================================================
+DESIGN OBJECTIVE
+==================================================
+
+Apply the requested interior design style while respecting all
+physical constraints of the original room.
+
+The design should feel intentional, sophisticated and realistic.
+
+Furniture, lighting, textiles, artwork and decorative objects
+should be appropriately selected for the requested style.
+
+Do not let the design style override the physical characteristics
+of the original room.
+
+==================================================
+DARK EUROPEAN ESTATE STYLE
+==================================================
+
+When the selected style is "Dark European Estate", favor:
+
+- rich burgundy accents
 - dark walnut
-- black marble
+- black or dark stone
 - antique brass
-- cream accents
+- cream and warm neutral accents
 - velvet
-- classic European furniture
-- Persian-inspired rug
-- elegant statement chandelier
+- elegant European furniture
+- Persian-inspired rugs
+- sophisticated chandeliers
 - framed artwork
-- heavy curtains
+- substantial curtains
 - tasteful greenery
 - warm cinematic lighting
 
-IMPORTANT:
-Do not add text, labels, prices, product names, logos or watermarks to the image.
-Keep the original camera viewpoint and room proportions as faithful as possible.
+Use these characteristics selectively and coherently.
+
+Do not exaggerate the style to the point that the room loses
+its original identity.
+
+==================================================
+PHOTOREALISM
+==================================================
+
+The result must look like a real professionally photographed
+interior.
+
+Use:
+- realistic materials
+- realistic lighting
+- realistic shadows
+- realistic reflections
+- realistic furniture proportions
+- realistic object placement
+- natural depth and perspective
+
+Avoid:
+- CGI appearance
+- cartoon appearance
+- artificial-looking furniture
+- impossible geometry
+- distorted architecture
+- floating objects
+
+==================================================
+FINAL VERIFICATION
+==================================================
+
+Before producing the final image, prioritize these requirements
+in this order:
+
+1. Preserve the original room geometry.
+2. Preserve the original camera viewpoint and perspective.
+3. Preserve all user-specified fixed elements.
+4. Modify only the requested elements.
+5. Apply the requested design style.
+6. Maintain photorealism.
+
+If there is a conflict between design ambition and preservation
+of the original room, ALWAYS prioritize preservation.
+
+==================================================
+IMAGE CONTENT RESTRICTIONS
+==================================================
+
+Do not add:
+- text
+- labels
+- prices
+- product names
+- logos
+- watermarks
+- UI elements
+- written descriptions
+
+Return only the finished interior design visualization.
 `;
 
     const form = new FormData();
