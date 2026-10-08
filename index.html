@@ -163,10 +163,16 @@
 </div>
 
 <script>
+
 const button = document.getElementById("generate");
 const status = document.getElementById("status");
 const preview = document.getElementById("preview");
 const downloadButton = document.getElementById("download");
+
+
+/* ==============================
+   GENERAZIONE DEL PROGETTO
+   ============================== */
 
 button.addEventListener("click", async () => {
 
@@ -188,6 +194,7 @@ button.addEventListener("click", async () => {
     const formData = new FormData();
 
     formData.append("photo", photo);
+
     formData.append(
       "style",
       document.getElementById("style").value
@@ -213,12 +220,15 @@ button.addEventListener("click", async () => {
       document.getElementById("modify").value
     );
 
+
     const response = await fetch("/api/generate", {
       method: "POST",
       body: formData
     });
 
+
     const data = await response.json();
+
 
     if (!response.ok) {
       throw new Error(
@@ -226,25 +236,31 @@ button.addEventListener("click", async () => {
       );
     }
 
+
     if (!data.image) {
       throw new Error(
         "L'API non ha restituito un'immagine."
       );
     }
 
+
     preview.src = data.image;
     preview.style.display = "block";
 
     downloadButton.style.display = "block";
 
-    status.textContent = "✅ Progetto generato.";
+    status.textContent =
+      "✅ Progetto generato.";
+
 
   } catch (error) {
 
     preview.style.display = "none";
     downloadButton.style.display = "none";
 
-    status.textContent = "❌ " + error.message;
+    status.textContent =
+      "❌ " + error.message;
+
 
   } finally {
 
@@ -255,41 +271,71 @@ button.addEventListener("click", async () => {
 });
 
 
-downloadButton.addEventListener("click", async () => {
+/* ==============================
+   DOWNLOAD IMMAGINE
+   ============================== */
+
+downloadButton.addEventListener("click", () => {
 
   if (!preview.src) {
     return;
   }
 
+
+  /*
+    Proviamo prima il download normale.
+  */
+
+  const link = document.createElement("a");
+
+  link.href = preview.src;
+  link.download = "roomcraft-progetto.jpg";
+
+  document.body.appendChild(link);
+
   try {
 
-    const response = await fetch(preview.src);
-    const blob = await response.blob();
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "roomcraft-progetto.jpg";
-
-    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 1000);
-
-    status.textContent = "✅ Immagine scaricata.";
 
   } catch (error) {
 
     console.error(error);
 
-    status.textContent =
-      "❌ Impossibile scaricare automaticamente l'immagine. Tieni premuta l'immagine e scegli Salva in Foto.";
-
   }
 
+  document.body.removeChild(link);
+
+
+  /*
+    Su alcuni browser/iPhone il download automatico
+    di una data URL può non essere supportato.
+    Apriamo quindi anche l'immagine in una nuova scheda.
+  */
+
+  setTimeout(() => {
+
+    const newWindow = window.open(
+      preview.src,
+      "_blank"
+    );
+
+    if (!newWindow) {
+
+      status.textContent =
+        "ℹ️ Tieni premuta l'immagine e scegli «Salva in Foto».";
+
+    } else {
+
+      status.textContent =
+        "ℹ️ Se il download non è partito automaticamente, tieni premuta l'immagine e scegli «Salva in Foto».";
+
+    }
+
+  }, 300);
+
 });
+
+</script>
+
+</body>
+</html>
