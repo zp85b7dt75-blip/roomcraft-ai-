@@ -255,23 +255,41 @@ button.addEventListener("click", async () => {
 });
 
 
-downloadButton.addEventListener("click", () => {
+downloadButton.addEventListener("click", async () => {
 
   if (!preview.src) {
     return;
   }
 
-  const link = document.createElement("a");
+  try {
 
-  link.href = preview.src;
-  link.download = "roomcraft-progetto.jpg";
+    const response = await fetch(preview.src);
+    const blob = await response.blob();
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "roomcraft-progetto.jpg";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
+
+    status.textContent = "✅ Immagine scaricata.";
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.textContent =
+      "❌ Impossibile scaricare automaticamente l'immagine. Tieni premuta l'immagine e scegli Salva in Foto.";
+
+  }
 
 });
-</script>
-
-</body>
-</html>
